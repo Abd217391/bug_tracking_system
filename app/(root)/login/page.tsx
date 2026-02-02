@@ -98,7 +98,7 @@ export default function LoginPage() {
         <hr className="opacity-10" />
 
         <p className="text-center text-sm text-gray-500 pt-4">
-          Don't have an account?{" "}
+          Do not have an account?{" "}
           <Link
             href="/join-us"
             className="text-[#0066FF] font-bold hover:underline"

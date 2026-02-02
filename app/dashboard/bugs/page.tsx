@@ -23,13 +23,15 @@ import BugGridView from "@/components/bugs/BugGridView";
 interface Bug {
   id: number;
   title: string;
+  description: string;
   status: string;
-  assignees: { name: string }[];
+  type: string;
+  created_by: number;
   deadline?: string;
   screenshot_url?: string;
-  description?: string;
-  type?: string;
+  created_at: string;
 }
+
 
 interface Project {
   id: number;
