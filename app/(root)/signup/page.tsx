@@ -1,15 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { User, Phone, Mail, Lock, ArrowRight, Eye, EyeOff } from "lucide-react";
 
 export default function SignUpPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const role = searchParams.get("role"); // get role from query params
 
+  // Form state
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -19,16 +18,29 @@ export default function SignUpPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // Redirect if no role
+  // Role state (from query params)
+  const [role, setRole] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false); // ensure code runs only on client
+
   useEffect(() => {
+    // This code only runs on the client
+    setMounted(true);
+    const params = new URLSearchParams(window.location.search);
+    const roleParam = params.get("role");
+    setRole(roleParam);
+  }, []);
+
+  if (!mounted) return null; // avoid server-side rendering issues
+
+  const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
     if (!role) {
       alert("Please select a role first");
       router.push("/join-us");
+      return;
     }
-  }, [role, router]);
 
-  async function handleSignup(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
     if (password !== confirmPassword) {
       alert("Passwords do not match");
       return;
@@ -43,15 +55,14 @@ export default function SignUpPage() {
         body: JSON.stringify({ name, phone, email, password, role }),
       });
 
-      let data;
-      try {
+      const contentType = res.headers.get("content-type");
+      let data: any = {};
+
+      // Check if the response is JSON
+      if (contentType && contentType.includes("application/json")) {
         data = await res.json();
-      } catch (err) {
-        // If JSON parsing fails, show raw response
-        const text = await res.text();
-        console.error("Signup failed, server returned HTML:", text);
-        alert("Signup failed. Check console for details.");
-        return;
+      } else {
+        data = { detail: await res.text() }; // fallback
       }
 
       if (!res.ok) {
@@ -62,68 +73,74 @@ export default function SignUpPage() {
       alert("Signup successful! Please login.");
       router.push("/login");
     } catch (err) {
-      console.error("Network error:", err);
+      console.error(err);
       alert("Something went wrong");
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   return (
-    <div className="w-full max-w-[440px] px-6 py-10">
+    <div className="w-full max-w-[440px] px-6 py-10 mx-auto">
       <form className="space-y-6" onSubmit={handleSignup}>
-        <h1 className="text-3xl font-bold text-[#1e1b4b]">Sign Up</h1>
-        <p className="text-gray-500 mt-2">Please fill your information below</p>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-[#1e1b4b]">Sign Up</h1>
+          <p className="text-gray-500 mt-2">Please fill your information below</p>
+        </div>
 
         {/* Name */}
         <div className="relative group">
-          <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#0066FF] transition-colors">
+            <User size={20} />
+          </span>
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Name"
             className="w-full pl-12 h-14 rounded-lg outline-none text-gray-900 placeholder-gray-400 font-medium border border-transparent bg-[#F5F7FA] focus:bg-white focus:border-[#0066FF] focus:ring-4 focus:ring-blue-500/10"
-            required
           />
         </div>
 
         {/* Phone */}
         <div className="relative group">
-          <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#0066FF]">
+            <Phone size={20} />
+          </span>
           <input
             type="text"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             placeholder="Mobile number"
             className="w-full pl-12 h-14 rounded-lg outline-none text-gray-900 placeholder-gray-400 font-medium border border-transparent bg-[#F5F7FA] focus:bg-white focus:border-[#0066FF] focus:ring-4 focus:ring-blue-500/10"
-            required
           />
         </div>
 
         {/* Email */}
         <div className="relative group">
-          <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#0066FF] transition-colors">
+            <Mail size={20} />
+          </span>
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="E-mail"
             className="w-full pl-12 h-14 rounded-lg outline-none text-gray-900 placeholder-gray-400 font-medium border border-transparent bg-[#F5F7FA] focus:bg-white focus:border-[#0066FF] focus:ring-4 focus:ring-blue-500/10"
-            required
           />
         </div>
 
         {/* Password */}
         <div className="relative group">
-          <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#0066FF] transition-colors">
+            <Lock size={20} />
+          </span>
           <input
             type={showPassword ? "text" : "password"}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Password"
             className="w-full pl-12 pr-10 h-14 rounded-lg outline-none text-gray-900 placeholder-gray-400 font-medium border border-transparent bg-[#F5F7FA] focus:bg-white focus:border-[#0066FF] focus:ring-4 focus:ring-blue-500/10"
-            required
           />
           <span
             onClick={() => setShowPassword(!showPassword)}
@@ -135,14 +152,15 @@ export default function SignUpPage() {
 
         {/* Confirm Password */}
         <div className="relative group">
-          <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#0066FF] transition-colors">
+            <Lock size={20} />
+          </span>
           <input
             type={showConfirmPassword ? "text" : "password"}
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             placeholder="Confirm Password"
             className="w-full pl-12 pr-10 h-14 rounded-lg outline-none text-gray-900 placeholder-gray-400 font-medium border border-transparent bg-[#F5F7FA] focus:bg-white focus:border-[#0066FF] focus:ring-4 focus:ring-blue-500/10"
-            required
           />
           <span
             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
@@ -152,6 +170,7 @@ export default function SignUpPage() {
           </span>
         </div>
 
+        {/* Submit Button */}
         <button
           type="submit"
           disabled={loading}
