@@ -38,17 +38,18 @@ export default function Navbar() {
 
   const isActive = (path: string) => pathname.includes(path);
 
-  const containerClass = "max-w-[1000px] mx-auto px-6";
+  const containerClass = "max-w-[1000px] mx-auto px-4 md:px-6";
 
   return (
     <nav className="bg-white border-b border-gray-100 sticky top-0 z-40">
       <div className={`${containerClass} flex items-center justify-between py-2`}>
-        <div className="flex items-center gap-10">
-          <div className="cursor-pointer" onClick={() => router.push("/dashboard/project")}>
-            <img src="/logo.png" alt="ManageBug" className="h-5 object-contain" />
+        <div className="flex items-center gap-4 md:gap-10">
+          {/* Logo - Slightly smaller on mobile to save space */}
+          <div className="cursor-pointer shrink-0" onClick={() => router.push("/dashboard/project")}>
+            <img src="/logo.png" alt="ManageBug" className="h-4 md:h-5 object-contain" />
           </div>
           
-          <div className="flex items-center gap-5">
+          <div className="flex items-center gap-3 md:gap-5">
             {/* PROJECTS BUTTON */}
             <button 
               onClick={() => router.push("/dashboard/project")} 
@@ -61,7 +62,8 @@ export default function Navbar() {
                 alt="" 
                 className={`h-3.5 w-3.5 ${isActive("/dashboard/project") ? "" : "opacity-50"}`} 
               />
-              <span>Projects</span>
+              {/* Text hidden on small mobile, shown on tablet/desktop */}
+              <span className="hidden sm:inline">Projects</span>
             </button>
 
             {/* BUGS BUTTON */}
@@ -76,15 +78,16 @@ export default function Navbar() {
                 alt="" 
                 className={`h-3.5 ${isActive("/dashboard/bugs") ? "" : "opacity-50"}`} 
               />
-              <span>Bugs</span>
+              {/* Text hidden on small mobile, shown on tablet/desktop */}
+              <span className="hidden sm:inline">Bugs</span>
             </button>
           </div>
         </div>
 
         {/* User Profile Area */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 md:gap-4">
           
-          {/* BELL ICON - Hidden on mobile, visible on desktop (md) */}
+          {/* BELL ICON - Completely hidden on mobile view */}
           <div className="hidden md:block">
              <Bell size={16} className="text-[#94A3B8] cursor-pointer" />
           </div>
@@ -92,13 +95,16 @@ export default function Navbar() {
           <div className="relative">
             <div 
               onClick={() => setIsProfileOpen(!isProfileOpen)} 
-              className="flex items-center gap-2 bg-[#F8FAFC] px-2 py-1 rounded-md border border-gray-100 cursor-pointer"
+              className="flex items-center gap-1.5 md:gap-2 bg-[#F8FAFC] px-2 py-1 rounded-md border border-gray-100 cursor-pointer"
             >
-              <div className="w-6 h-6 bg-[#0F172A] rounded-md flex items-center justify-center text-white text-[10px] font-bold">
+              <div className="w-5 h-5 md:w-6 md:h-6 bg-[#0F172A] rounded-md flex items-center justify-center text-white text-[9px] md:text-[10px] font-bold">
                 {role ? role[0].toUpperCase() : "U"}
               </div>
-              <span className="text-[11px] font-bold text-[#1E293B]">{role?.toUpperCase() || "USER"}.</span>
-              <ChevronDown className={`transition-transform duration-200 ${isProfileOpen ? "rotate-180" : ""}`} size={12} />
+              {/* Role text - kept short for mobile */}
+              <span className="text-[10px] md:text-[11px] font-bold text-[#1E293B]">
+                {role?.toUpperCase() || "USER"}.
+              </span>
+              <ChevronDown className={`transition-transform duration-200 ${isProfileOpen ? "rotate-180" : ""}`} size={10} />
             </div>
 
             {isProfileOpen && (
