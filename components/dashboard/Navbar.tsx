@@ -1,12 +1,12 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useRouter, usePathname } from "next/navigation"; // 1. Import usePathname
+import { useRouter, usePathname } from "next/navigation";
 import { Bell, ChevronDown, LogOut, User } from "lucide-react";
 import { API_BASE_URL } from "@/utils/constants";
 
 export default function Navbar() {
   const router = useRouter();
-  const pathname = usePathname(); // 2. Get the current URL path
+  const pathname = usePathname();
   const [role, setRole] = useState<string | null>(null);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : "";
@@ -36,7 +36,6 @@ export default function Navbar() {
     router.replace("/login");
   };
 
-  // 3. Helper function to check if a link is active
   const isActive = (path: string) => pathname.includes(path);
 
   const containerClass = "max-w-[1000px] mx-auto px-6";
@@ -65,7 +64,7 @@ export default function Navbar() {
               <span>Projects</span>
             </button>
 
-            {/* BUGS BUTTON - This will now turn blue when you are on the bugs page */}
+            {/* BUGS BUTTON */}
             <button 
               onClick={() => router.push(`/dashboard/bugs`)} 
               className={`flex items-center gap-1.5 text-[13px] font-medium transition-colors ${
@@ -82,24 +81,38 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* User Profile Area (Remains the same) */}
+        {/* User Profile Area */}
         <div className="flex items-center gap-4">
-          <Bell size={16} className="text-[#94A3B8] cursor-pointer" />
+          
+          {/* BELL ICON - Hidden on mobile, visible on desktop (md) */}
+          <div className="hidden md:block">
+             <Bell size={16} className="text-[#94A3B8] cursor-pointer" />
+          </div>
+
           <div className="relative">
-            <div onClick={() => setIsProfileOpen(!isProfileOpen)} className="flex items-center gap-2 bg-[#F8FAFC] px-2 py-1 rounded-md border border-gray-100 cursor-pointer">
+            <div 
+              onClick={() => setIsProfileOpen(!isProfileOpen)} 
+              className="flex items-center gap-2 bg-[#F8FAFC] px-2 py-1 rounded-md border border-gray-100 cursor-pointer"
+            >
               <div className="w-6 h-6 bg-[#0F172A] rounded-md flex items-center justify-center text-white text-[10px] font-bold">
                 {role ? role[0].toUpperCase() : "U"}
               </div>
-              <span className="text-[11px] font-bold text-[#1E293B]">{role?.toUpperCase()}.</span>
-              <ChevronDown className={isProfileOpen ? "rotate-180" : ""} size={12} />
+              <span className="text-[11px] font-bold text-[#1E293B]">{role?.toUpperCase() || "USER"}.</span>
+              <ChevronDown className={`transition-transform duration-200 ${isProfileOpen ? "rotate-180" : ""}`} size={12} />
             </div>
 
             {isProfileOpen && (
               <div className="absolute right-0 mt-2 w-32 bg-white border border-gray-100 rounded-lg shadow-lg py-1 z-50">
-                <button onClick={() => { setIsProfileOpen(false); router.push("/dashboard/profile"); }} className="w-full text-left px-3 py-1.5 text-[11px] flex items-center gap-2 hover:bg-gray-50 border-b border-gray-50">
+                <button 
+                  onClick={() => { setIsProfileOpen(false); router.push("/dashboard/profile"); }} 
+                  className="w-full text-left px-3 py-1.5 text-[11px] flex items-center gap-2 hover:bg-gray-50 border-b border-gray-50"
+                >
                   <User size={12} /> Profile
                 </button>
-                <button onClick={handleLogout} className="w-full text-left px-3 py-1.5 text-[11px] text-red-500 flex items-center gap-2 hover:bg-red-50">
+                <button 
+                  onClick={handleLogout} 
+                  className="w-full text-left px-3 py-1.5 text-[11px] text-red-500 flex items-center gap-2 hover:bg-red-50"
+                >
                   <LogOut size={12} /> Logout
                 </button>
               </div>
